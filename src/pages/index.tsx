@@ -1,74 +1,121 @@
 import NextImage from "next/image";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
-import { Box, Heading, Text, Button } from "@chakra-ui/react";
+import { useLayoutEffect, useRef } from "react";
+
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  chakra,
+  Stack,
+  Flex,
+} from "@chakra-ui/react";
+import Marquee from "react-fast-marquee";
+import useSmoothHorizontalScroll from "use-smooth-horizontal-scroll";
+
+import { useSideScroll } from "./useSideScroll";
+
 import { NextSeo } from "next-seo";
+import ImageBox from "../components/common/ImageBox";
+import { useHorizontalScroll } from "../utils";
 
-const Home = () => (
-  <>
-    <NextSeo title="Home" />
+const array = new Array(9).fill("i");
 
-    <Box
-      as="section"
-      maxW="1440px"
-      py="4"
-      px={[4, 6, 10, 14, 20]}
-      mx="auto"
-      display="flex"
-      flexDir={{ base: "column-reverse", lg: "row" }}
-      justifyContent={{ base: "center", lg: "space-between" }}
-      alignItems="center"
-      textAlign={{ base: "center", lg: "left" }}
-    >
-      <Box pr={{ lg: "4" }} maxW={{ base: "90%", lg: "50%" }}>
-        <Heading
-          as="h1"
-          fontSize={{ base: "1.5rem", sm: "2rem", lg: "3rem" }}
-          fontWeight="800"
-        >
-          Help your team for tracking projects better.
-        </Heading>
-        <Text fontWeight="400" pt="4" pb="10">
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolore atque
-          perspiciatis qui ex ducimus nesciunt et nam. In amet earum optio cum
-          aperiam autem, possimus vero voluptates! Laboriosam, possimus
-          aspernatur.
-        </Text>
-        <Box
-          display="flex"
-          justifyContent={{ base: "center", lg: "flex-start" }}
-          alignItems="center"
-        >
-          <Button
-            colorScheme="facebook"
-            variant="solid"
-            mr="5"
-            fontWeight="600"
-            size="lg"
-          >
-            Create new account
-          </Button>
-          <Button
-            colorScheme="facebook"
-            variant="outline"
-            px="12"
-            fontWeight="600"
-            size="lg"
-          >
-            Login
-          </Button>
+const oneArray = [
+  "#fafa6e",
+  "#c4ec74",
+  "#92dc7e",
+  "#64c987",
+  "#39b48e",
+  "#089f8f",
+  "#00898a",
+  "#08737f",
+];
+
+const Home = () => {
+  const { scrollContainerRef, handleScroll, scrollTo, isAtStart, isAtEnd } =
+    useSmoothHorizontalScroll();
+
+  const component = useRef();
+  const slider = useRef();
+
+  useLayoutEffect(() => {
+    let ctx = gsap.context(() => {
+      let panels = gsap.utils.toArray(".panel");
+      gsap.to(panels, {
+        xPercent: -100 * (panels.length - 1),
+        ease: "none",
+        scrollTrigger: {
+          trigger: slider.current,
+          pin: true,
+          scrub: 1,
+          snap: 1 / (panels.length - 1),
+          end: () => "+=" + slider.current.offsetWidth,
+        },
+      });
+    }, component);
+    return () => ctx.revert();
+  });
+
+  return (
+    <>
+      <NextSeo title="Home" />
+
+      <Box
+        as="section"
+        maxW="1440px"
+        py="4"
+        px={[4, 6, 10, 14, 20]}
+        mx="auto"
+        display="flex"
+        flexDir={{ base: "column-reverse", lg: "row" }}
+        justifyContent={{ base: "center", lg: "space-between" }}
+        alignItems="center"
+        textAlign={{ base: "center", lg: "left" }}
+      ></Box>
+      <Stack spacing="12">
+        <Marquee direction="left">
+          {" "}
+          <Flex gap="12">
+            {oneArray?.map((item, index) => (
+              <ImageBox bgColor={item} key={index} />
+            ))}
+          </Flex>
+        </Marquee>
+
+        <Marquee direction="right">
+          <Flex gap="12">
+            {oneArray?.map((item, index) => (
+              <ImageBox bgColor={item} key={index} />
+            ))}
+          </Flex>
+        </Marquee>
+
+        <Marquee>
+          <Flex gap="12">
+            {oneArray?.map((item, index) => (
+              <ImageBox bgColor={item} key={index} />
+            ))}
+          </Flex>
+        </Marquee>
+
+        <Box ref={slider}  maxW="75%" overflow="auto">
+          <Flex gap="12">
+            {oneArray?.map((item, index) => (
+              <ImageBox bgColor={item} key={index} />
+            ))}
+
+            {oneArray?.map((item, index) => (
+              <ImageBox bgColor={item} key={index} />
+            ))}
+          </Flex>
         </Box>
-      </Box>
-      <Box maxW={{ base: "xl", lg: "auto" }}>
-        <NextImage
-          src="/team-bro.png"
-          width="600"
-          height="600"
-          alt="team"
-          priority
-        />
-      </Box>
-    </Box>
-  </>
-);
+      </Stack>
+    </>
+  );
+};
 
 export default Home;
